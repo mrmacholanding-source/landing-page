@@ -1,0 +1,8 @@
+{
+  "name": "mrmacho-landing-page",
+  "version": "1.0.0",
+  "description": "Sitio historico listo para Netlify + Supabase.",
+  "scripts": {
+    "start": "npx serve public"
+  }
+}

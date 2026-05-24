@@ -1,0 +1,3 @@
+window.PUBLIC_SUPABASE_URL = "https://hnldqxiyczwulynzoxvw.supabase.co";
+window.PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubGRxeGl5Y3p3dWx5bnpveHZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NTE2NDEsImV4cCI6MjA5NTIyNzY0MX0.HxihLoYcyFzb8vWuDk7HuEfeqDbySfb28_aQ0lSVu_Q";
+window.PUBLIC_SUPABASE_BUCKET = "site-media";

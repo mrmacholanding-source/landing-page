@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin | Biblioteca Viva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body data-view="admin">
+    <div class="site-bg-overlay"></div>
+    <main class="admin-shell">
+      <section id="login-screen" class="auth-card panel">
+        <div>
+          <p class="eyebrow">Acceso privado</p>
+          <h1>Panel de administracion</h1>
+          <p>
+            Solo quien conozca la ruta `/admin` y tenga usuario y contrasena puede editar fondos,
+            secciones, menu e imagenes del archivo historico.
+          </p>
+        </div>
+        <form id="login-form" class="stack-form">
+          <label>
+            Correo
+            <input id="email" type="email" autocomplete="username" required>
+          </label>
+          <label>
+            Contrasena
+            <input id="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button type="submit" class="button">Ingresar</button>
+          <p id="login-status" class="status-text"></p>
+        </form>
+      </section>
+
+      <section id="admin-screen" class="hidden">
+        <header class="admin-header panel">
+          <div>
+            <p class="eyebrow">Edicion editorial</p>
+            <h1>Biblioteca Viva de Historia</h1>
+            <p>Gestiona apariencia, secciones cronologicas y articulos con imagenes.</p>
+          </div>
+          <div class="admin-header-actions">
+            <a class="button button-secondary" href="/" target="_blank" rel="noreferrer">Ver sitio</a>
+            <button id="logout-button" class="button button-danger" type="button">Cerrar sesion</button>
+          </div>
+        </header>
+
+        <section class="admin-layout">
+          <article class="panel">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Apariencia</p>
+                <h2>Fondo, colores y portada</h2>
+              </div>
+            </div>
+            <form id="settings-form" class="stack-form">
+              <label>
+                Titulo del sitio
+                <input id="site_title" required>
+              </label>
+              <label>
+                Subtitulo / kicker
+                <input id="hero_kicker">
+              </label>
+              <label>
+                Titulo principal
+                <input id="hero_title" required>
+              </label>
+              <label>
+                Texto de portada
+                <textarea id="hero_text" rows="4" required></textarea>
+              </label>
+              <div class="dual-grid">
+                <label>
+                  Color base
+                  <input id="base_color" type="color">
+                </label>
+                <label>
+                  Color de acento
+                  <input id="accent_color" type="color">
+                </label>
+              </div>
+              <div class="dual-grid">
+                <label>
+                  Tono secundario
+                  <input id="secondary_color" type="color">
+                </label>
+                <label>
+                  Color del texto
+                  <input id="ink_color" type="color">
+                </label>
+              </div>
+              <label>
+                Imagen de fondo del sitio
+                <input id="background_image" placeholder="https://...">
+              </label>
+              <label>
+                Imagen principal de portada
+                <input id="hero_image" placeholder="https://...">
+              </label>
+              <div class="upload-row">
+                <label class="upload-box">
+                  Subir imagen de fondo
+                  <input id="background_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                </label>
+                <label class="upload-box">
+                  Subir imagen de portada
+                  <input id="hero_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                </label>
+              </div>
+              <button type="submit" class="button">Guardar apariencia</button>
+              <p id="settings-status" class="status-text"></p>
+            </form>
+          </article>
+
+          <article class="panel">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Menu inicial</p>
+                <h2>Secciones y edades</h2>
+              </div>
+            </div>
+            <form id="section-form" class="stack-form">
+              <input id="section_id" type="hidden">
+              <label>
+                Nombre visible
+                <input id="section_name" required>
+              </label>
+              <label>
+                Descripcion corta
+                <input id="section_description" required>
+              </label>
+              <div class="dual-grid">
+                <label>
+                  Slug
+                  <input id="section_slug" placeholder="edad-media">
+                </label>
+                <label>
+                  Orden
+                  <input id="section_order" type="number" min="0" value="0">
+                </label>
+              </div>
+              <button type="submit" class="button">Guardar seccion</button>
+              <button id="clear-section" type="button" class="button button-secondary">Limpiar</button>
+              <p id="section-status" class="status-text"></p>
+            </form>
+            <div id="sections-list" class="entity-list"></div>
+          </article>
+        </section>
+
+        <section class="admin-layout">
+          <article class="panel admin-wide">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Articulos</p>
+                <h2>Blog de historia</h2>
+              </div>
+            </div>
+            <form id="post-form" class="stack-form">
+              <input id="post_id" type="hidden">
+              <label>
+                Titulo
+                <input id="post_title" required>
+              </label>
+              <label>
+                Resumen
+                <textarea id="post_summary" rows="3" required></textarea>
+              </label>
+              <div class="dual-grid">
+                <label>
+                  Fecha historica o de publicacion
+                  <input id="post_date" placeholder="Siglo XII / 1099 / 2026-05-24" required>
+                </label>
+                <label>
+                  Fuente
+                  <input id="post_source" placeholder="Libro, revista, manuscrito...">
+                </label>
+              </div>
+              <div class="dual-grid">
+                <label>
+                  Seccion
+                  <select id="post_section_id" required></select>
+                </label>
+                <label>
+                  Etiqueta / era
+                  <input id="post_era" placeholder="Edad Media, Antiguedad, etc.">
+                </label>
+              </div>
+              <label>
+                Imagen del articulo
+                <input id="post_image" placeholder="https://...">
+              </label>
+              <label class="upload-box">
+                Subir imagen del articulo
+                <input id="post_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+              </label>
+              <label>
+                Contenido
+                <textarea id="post_content" rows="8" required></textarea>
+              </label>
+              <label class="toggle-row">
+                <input id="post_featured" type="checkbox">
+                Destacar en portada
+              </label>
+              <div class="admin-header-actions">
+                <button type="submit" class="button">Guardar articulo</button>
+                <button id="clear-post" type="button" class="button button-secondary">Limpiar</button>
+              </div>
+              <p id="post-status" class="status-text"></p>
+            </form>
+          </article>
+          <article class="panel admin-wide">
+            <div class="section-head compact">
+              <div>
+                <p class="eyebrow">Listado</p>
+                <h2>Entradas actuales</h2>
+              </div>
+            </div>
+            <div id="posts-list" class="entity-list"></div>
+          </article>
+        </section>
+      </section>
+    </main>
+
+    <template id="entity-item-template">
+      <article class="entity-item">
+        <div class="entity-copy">
+          <p class="entity-kicker"></p>
+          <h3 class="entity-title"></h3>
+          <p class="entity-summary"></p>
+        </div>
+        <div class="entity-actions">
+          <button class="button button-secondary entity-edit" type="button">Editar</button>
+          <button class="button button-danger entity-delete" type="button">Eliminar</button>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="/admin/admin.js"></script>
+  </body>
+</html>

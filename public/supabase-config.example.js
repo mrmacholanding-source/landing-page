@@ -1,0 +1,3 @@
+window.PUBLIC_SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+window.PUBLIC_SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+window.PUBLIC_SUPABASE_BUCKET = "site-media";

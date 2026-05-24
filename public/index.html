@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Archivo de Historia | Biblioteca Viva</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Source+Serif+4:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body data-view="public">
+    <div class="site-bg-overlay"></div>
+    <header class="topbar">
+      <div class="brand-lockup">
+        <p class="brand-kicker">Archivo editorial</p>
+        <a class="brand-title" href="/">Biblioteca Viva de Historia</a>
+      </div>
+      <nav id="main-nav" class="main-nav"></nav>
+    </header>
+
+    <main class="page-shell">
+      <section id="hero" class="hero-card panel"></section>
+
+      <section id="timeline-menu" class="timeline-menu"></section>
+
+      <section class="panel intro-grid">
+        <article>
+          <p class="eyebrow">Proposito</p>
+          <h2>Un blog para libros, revistas, fuentes y memoria historica</h2>
+          <p>
+            Este espacio organiza articulos, referencias e imagenes en una experiencia visual clara,
+            adaptable a telefono y computador, con un aire de manuscrito iluminado pero lenguaje contemporaneo.
+          </p>
+        </article>
+        <article>
+          <p class="eyebrow">Exploracion</p>
+          <h2>Recorridos por edades, fechas y temas</h2>
+          <p>
+            El menu inicial puede ordenar el contenido por periodos historicos, civilizaciones,
+            siglos o temas editoriales, todo editable desde el panel de administracion.
+          </p>
+        </article>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <p class="eyebrow">Entradas</p>
+          <h2 id="posts-title">Archivo principal</h2>
+        </div>
+        <div class="filters">
+          <select id="section-filter" class="field-select">
+            <option value="all">Todas las secciones</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="posts-grid" class="posts-grid"></section>
+    </main>
+
+    <template id="hero-template">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <p class="eyebrow hero-kicker"></p>
+          <h1 class="hero-title"></h1>
+          <p class="hero-text"></p>
+        </div>
+        <div class="hero-visual">
+          <img class="hero-image" alt="">
+        </div>
+      </div>
+    </template>
+
+    <template id="section-pill-template">
+      <button class="timeline-pill" type="button"></button>
+    </template>
+
+    <template id="post-template">
+      <article class="post-card panel">
+        <div class="post-media-wrap">
+          <img class="post-media" alt="">
+        </div>
+        <div class="post-meta">
+          <span class="meta-chip post-era"></span>
+          <span class="meta-chip post-date"></span>
+        </div>
+        <h3 class="post-title"></h3>
+        <p class="post-summary"></p>
+        <p class="post-content"></p>
+        <p class="post-source"></p>
+      </article>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
