@@ -61,11 +61,20 @@ function getCropState(node) {
   return cropState.get(node) || { x: 50, y: 50, zoom: 100 };
 }
 
+function normalizedCrop(node) {
+  const state = getCropState(node);
+  return {
+    x: Math.round(state.x),
+    y: Math.round(state.y),
+    zoom: Math.round(state.zoom)
+  };
+}
+
 function applyCrop(node, nextState) {
   const merged = { ...getCropState(node), ...nextState };
   cropState.set(node, merged);
-  node.style.backgroundPosition = `${Math.round(merged.x)}% ${Math.round(merged.y)}%`;
-  node.style.backgroundSize = `${Math.round(merged.zoom)}%`;
+  node.style.backgroundPosition = `${merged.x}% ${merged.y}%`;
+  node.style.backgroundSize = `${merged.zoom}%`;
 }
 
 function bindCropPreview(node) {
@@ -110,16 +119,11 @@ function bindCropPreview(node) {
   }, { passive: false });
 }
 
-function normalizedCrop(node) {
-  const state = getCropState(node);
-  return {
-    x: Math.round(state.x),
-    y: Math.round(state.y),
-    zoom: Math.round(state.zoom)
-  };
-}
-
 function applySettingsTheme(settings) {
+  if (!settings) {
+    return;
+  }
+
   const root = document.documentElement;
   root.style.setProperty("--bg", settings.base_color || "#f5eddc");
   root.style.setProperty("--accent", settings.accent_color || "#caa35f");
@@ -150,29 +154,6 @@ async function requireSession() {
   showLogin();
 }
 
-function syncSectionOrderOptions(selectedValue, editingId = "") {
-  const select = document.getElementById("section_order");
-  const used = new Set(
-    sections
-      .filter((section) => section.id !== editingId)
-      .map((section) => Number(section.sort_order))
-  );
-
-  select.innerHTML = "";
-  const max = sections.length + 1;
-
-  for (let position = 1; position <= max; position += 1) {
-    if (!used.has(position) || position === Number(selectedValue)) {
-      const option = document.createElement("option");
-      option.value = String(position);
-      option.textContent = `Posicion ${position}`;
-      select.appendChild(option);
-    }
-  }
-
-  select.value = selectedValue ? String(selectedValue) : (select.options[0]?.value || "1");
-}
-
 async function bootstrapAdmin() {
   const [{ data: settings }, { data: sectionRows }, { data: postRows }] = await Promise.all([
     supabase.from("site_settings").select("*").eq("id", 1).maybeSingle(),
@@ -189,21 +170,14 @@ async function bootstrapAdmin() {
 }
 
 function fillSettings(settings) {
-  const fallbackLeftTitle = "Un blog para libros, revistas, fuentes y memoria historica";
-  const fallbackLeftText = "Este espacio organiza articulos, referencias e imagenes en una experiencia visual clara, adaptable a telefono y computador, con un aire de manuscrito iluminado pero lenguaje contemporaneo.";
-  const fallbackRightTitle = "Recorridos por edades, fechas y temas";
-  const fallbackRightText = "El menu inicial puede ordenar el contenido por periodos historicos, civilizaciones, siglos o temas editoriales, todo editable desde el panel de administracion.";
-
   document.getElementById("site_title").value = settings.site_title || "";
   document.getElementById("hero_kicker").value = settings.hero_kicker || "";
   document.getElementById("hero_title").value = settings.hero_title || "";
   document.getElementById("hero_text").value = settings.hero_text || "";
-  document.getElementById("intro_left_label").value = settings.intro_left_label || "Proposito";
-  document.getElementById("intro_right_label").value = settings.intro_right_label || "Exploracion";
-  document.getElementById("intro_left_title").value = settings.intro_left_title || fallbackLeftTitle;
-  document.getElementById("intro_left_text").value = settings.intro_left_text || fallbackLeftText;
-  document.getElementById("intro_right_title").value = settings.intro_right_title || fallbackRightTitle;
-  document.getElementById("intro_right_text").value = settings.intro_right_text || fallbackRightText;
+  document.getElementById("intro_left_title").value = settings.intro_left_title || "";
+  document.getElementById("intro_left_text").value = settings.intro_left_text || "";
+  document.getElementById("intro_right_title").value = settings.intro_right_title || "";
+  document.getElementById("intro_right_text").value = settings.intro_right_text || "";
   document.getElementById("base_color").value = settings.base_color || "#f5eddc";
   document.getElementById("accent_color").value = settings.accent_color || "#caa35f";
   document.getElementById("secondary_color").value = settings.secondary_color || "#9eb8b2";
@@ -239,7 +213,7 @@ function fillSettings(settings) {
 function resetSectionForm() {
   sectionForm.reset();
   document.getElementById("section_id").value = "";
-  syncSectionOrderOptions();
+  document.getElementById("section_order").value = "1";
 }
 
 function resetPostForm() {
@@ -257,7 +231,6 @@ function resetPostForm() {
 function renderSections() {
   sectionList.innerHTML = "";
   postSectionSelect.innerHTML = "";
-  syncSectionOrderOptions();
 
   if (!sections.length) {
     sectionList.innerHTML = '<div class="empty-state">Crea primero una seccion para organizar el menu inicial.</div>';
@@ -279,7 +252,7 @@ function renderSections() {
       document.getElementById("section_name").value = section.name;
       document.getElementById("section_description").value = section.description;
       document.getElementById("section_slug").value = section.slug;
-      syncSectionOrderOptions(section.sort_order, section.id);
+      document.getElementById("section_order").value = section.sort_order;
     });
 
     fragment.querySelector(".entity-delete").addEventListener("click", async () => {
@@ -415,8 +388,6 @@ logoutButton.addEventListener("click", async () => {
   "hero_kicker",
   "hero_title",
   "hero_text",
-  "intro_left_label",
-  "intro_right_label",
   "intro_left_title",
   "intro_left_text",
   "intro_right_title",
@@ -455,8 +426,6 @@ settingsForm.addEventListener("submit", async (event) => {
       hero_kicker: document.getElementById("hero_kicker").value.trim(),
       hero_title: document.getElementById("hero_title").value.trim(),
       hero_text: document.getElementById("hero_text").value.trim(),
-      intro_left_label: document.getElementById("intro_left_label").value.trim(),
-      intro_right_label: document.getElementById("intro_right_label").value.trim(),
       intro_left_title: document.getElementById("intro_left_title").value.trim(),
       intro_left_text: document.getElementById("intro_left_text").value.trim(),
       intro_right_title: document.getElementById("intro_right_title").value.trim(),
@@ -505,7 +474,6 @@ settingsForm.addEventListener("submit", async (event) => {
 
 sectionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-
   const payload = {
     id: document.getElementById("section_id").value || undefined,
     name: document.getElementById("section_name").value.trim(),

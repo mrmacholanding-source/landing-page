@@ -11,10 +11,8 @@ const leftRailImage = document.getElementById("left-rail-image");
 const rightRailImage = document.getElementById("right-rail-image");
 const brandTitle = document.getElementById("brand-title");
 const brandKicker = document.getElementById("brand-kicker");
-const introLeftLabel = document.getElementById("intro-left-label");
 const introLeftTitle = document.getElementById("intro-left-title");
 const introLeftText = document.getElementById("intro-left-text");
-const introRightLabel = document.getElementById("intro-right-label");
 const introRightTitle = document.getElementById("intro-right-title");
 const introRightText = document.getElementById("intro-right-text");
 
@@ -46,11 +44,6 @@ function toNumber(value, fallback = 50) {
 }
 
 function applyTheme(settings) {
-  const fallbackLeftTitle = "Un blog para libros, revistas, fuentes y memoria historica";
-  const fallbackLeftText = "Este espacio organiza articulos, referencias e imagenes en una experiencia visual clara, adaptable a telefono y computador, con un aire de manuscrito iluminado pero lenguaje contemporaneo.";
-  const fallbackRightTitle = "Recorridos por edades, fechas y temas";
-  const fallbackRightText = "El menu inicial puede ordenar el contenido por periodos historicos, civilizaciones, siglos o temas editoriales, todo editable desde el panel de administracion.";
-
   if (!settings) {
     return;
   }
@@ -61,26 +54,24 @@ function applyTheme(settings) {
   root.style.setProperty("--secondary", settings.secondary_color || "#9eb8b2");
   root.style.setProperty("--ink", settings.ink_color || "#33241b");
   root.style.setProperty("--site-bg-image", `url("${settings.background_image || "/history-hero.svg"}")`);
-  root.style.setProperty("--hero-image", `url("${settings.hero_image || "/history-hero.svg"}")`);
+  root.style.setProperty("--hero-image", `url("${settings.hero_image || settings.background_image || "/history-hero.svg"}")`);
 
   document.title = settings.site_title || "Archivo de Historia | Biblioteca Viva";
   brandTitle.textContent = settings.site_title || "Biblioteca Viva de Historia";
   brandKicker.textContent = settings.hero_kicker || "Archivo editorial";
-  introLeftLabel.textContent = settings.intro_left_label || "Proposito";
-  introLeftTitle.textContent = settings.intro_left_title || fallbackLeftTitle;
-  introLeftText.textContent = settings.intro_left_text || fallbackLeftText;
-  introRightLabel.textContent = settings.intro_right_label || "Exploracion";
-  introRightTitle.textContent = settings.intro_right_title || fallbackRightTitle;
-  introRightText.textContent = settings.intro_right_text || fallbackRightText;
+  introLeftTitle.textContent = settings.intro_left_title || "Un blog para libros, revistas, fuentes y memoria historica";
+  introLeftText.textContent = settings.intro_left_text || "Este espacio organiza articulos, referencias e imagenes en una experiencia visual clara, adaptable a telefono y computador, con un aire de manuscrito iluminado pero lenguaje contemporaneo.";
+  introRightTitle.textContent = settings.intro_right_title || "Recorridos por edades, fechas y temas";
+  introRightText.textContent = settings.intro_right_text || "El menu inicial puede ordenar el contenido por periodos historicos, civilizaciones, siglos o temas editoriales, todo editable desde el panel de administracion.";
 
   const leftRail = settings.left_rail_image || "/history-hero.svg";
   const rightRail = settings.right_rail_image || "/history-hero.svg";
-  leftRailImage.src = leftRail;
-  rightRailImage.src = rightRail;
-  leftRailImage.style.objectPosition = `${toNumber(settings.left_rail_position_x)}% ${toNumber(settings.left_rail_position_y)}%`;
-  rightRailImage.style.objectPosition = `${toNumber(settings.right_rail_position_x)}% ${toNumber(settings.right_rail_position_y)}%`;
-  leftRailImage.style.transform = `scale(${toNumber(settings.left_rail_zoom, 100) / 100})`;
-  rightRailImage.style.transform = `scale(${toNumber(settings.right_rail_zoom, 100) / 100})`;
+  leftRailImage.style.backgroundImage = `url("${leftRail}")`;
+  rightRailImage.style.backgroundImage = `url("${rightRail}")`;
+  leftRailImage.style.backgroundPosition = `${toNumber(settings.left_rail_position_x)}% ${toNumber(settings.left_rail_position_y)}%`;
+  rightRailImage.style.backgroundPosition = `${toNumber(settings.right_rail_position_x)}% ${toNumber(settings.right_rail_position_y)}%`;
+  leftRailImage.style.backgroundSize = "cover";
+  rightRailImage.style.backgroundSize = "cover";
 }
 
 function renderHero(settings) {
