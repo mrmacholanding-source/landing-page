@@ -8,6 +8,7 @@ const logoutButton = document.getElementById("logout-button");
 
 const settingsForm = document.getElementById("settings-form");
 const settingsStatus = document.getElementById("settings-status");
+const saveSettingsButton = document.getElementById("save-settings-button");
 const sectionForm = document.getElementById("section-form");
 const sectionStatus = document.getElementById("section-status");
 const sectionList = document.getElementById("sections-list");
@@ -58,6 +59,15 @@ function updateColorValue(id) {
 
 function getCropState(node) {
   return cropState.get(node) || { x: 50, y: 50, zoom: 100 };
+}
+
+function normalizedCrop(node) {
+  const state = getCropState(node);
+  return {
+    x: Math.round(state.x),
+    y: Math.round(state.y),
+    zoom: Math.round(state.zoom)
+  };
 }
 
 function applyCrop(node, nextState) {
@@ -395,6 +405,8 @@ logoutButton.addEventListener("click", async () => {
 
 settingsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  saveSettingsButton.disabled = true;
+  saveSettingsButton.textContent = "Guardando apariencia...";
 
   try {
     const heroImage = await maybeUpload("hero_upload", "hero", settingsStatus, heroPreview)
@@ -404,9 +416,9 @@ settingsForm.addEventListener("submit", async (event) => {
     const rightRailImageUrl = await maybeUpload("right_rail_upload", "rails", settingsStatus, rightRailPreview)
       || settingsForm.dataset.rightRailImage || "";
 
-    const heroCrop = getCropState(heroPreview);
-    const leftCrop = getCropState(leftRailPreview);
-    const rightCrop = getCropState(rightRailPreview);
+    const heroCrop = normalizedCrop(heroPreview);
+    const leftCrop = normalizedCrop(leftRailPreview);
+    const rightCrop = normalizedCrop(rightRailPreview);
 
     const payload = {
       id: 1,
@@ -446,8 +458,17 @@ settingsForm.addEventListener("submit", async (event) => {
     settingsForm.dataset.rightRailImage = rightRailImageUrl;
     applySettingsTheme(payload);
     setStatus(settingsStatus, `Apariencia guardada. Bucket: ${BUCKET_NAME}`);
+    saveSettingsButton.textContent = "Listo";
   } catch (error) {
     setStatus(settingsStatus, error.message);
+    saveSettingsButton.textContent = "Guardar apariencia";
+  } finally {
+    saveSettingsButton.disabled = false;
+    if (saveSettingsButton.textContent === "Listo") {
+      window.setTimeout(() => {
+        saveSettingsButton.textContent = "Guardar apariencia";
+      }, 1800);
+    }
   }
 });
 
@@ -484,7 +505,7 @@ postForm.addEventListener("submit", async (event) => {
       || postForm.dataset.extraImage1 || "";
     const imageUrl3 = await maybeUpload("post_upload_3", "posts", postStatus, postExtra2Preview)
       || postForm.dataset.extraImage2 || "";
-    const mainCrop = getCropState(postMainPreview);
+    const mainCrop = normalizedCrop(postMainPreview);
 
     const payload = {
       id: document.getElementById("post_id").value || undefined,
