@@ -40,3 +40,31 @@ export async function uploadImage(file, folder = "posts") {
   const { data } = supabase.storage.from(BUCKET_NAME).getPublicUrl(name);
   return data.publicUrl;
 }
+
+export function getStoragePathFromUrl(url) {
+  if (!url) {
+    return null;
+  }
+
+  const marker = `/storage/v1/object/public/${BUCKET_NAME}/`;
+  const index = url.indexOf(marker);
+  if (index === -1) {
+    return null;
+  }
+
+  return decodeURIComponent(url.slice(index + marker.length));
+}
+
+export async function deleteImageByUrl(url) {
+  const storagePath = getStoragePathFromUrl(url);
+  if (!storagePath) {
+    return { ok: false, reason: "no-storage-path" };
+  }
+
+  const { error } = await supabase.storage.from(BUCKET_NAME).remove([storagePath]);
+  if (error) {
+    throw error;
+  }
+
+  return { ok: true };
+}

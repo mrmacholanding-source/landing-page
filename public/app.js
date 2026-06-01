@@ -9,6 +9,8 @@ const sectionFilter = document.getElementById("section-filter");
 const postsTitle = document.getElementById("posts-title");
 const leftRailImage = document.getElementById("left-rail-image");
 const rightRailImage = document.getElementById("right-rail-image");
+const brandTitle = document.getElementById("brand-title");
+const brandKicker = document.getElementById("brand-kicker");
 
 let state = {
   settings: null,
@@ -32,6 +34,11 @@ function safeSplitGallery(value) {
     .filter(Boolean);
 }
 
+function percent(value, fallback = 50) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+}
+
 function applyTheme(settings) {
   if (!settings) {
     return;
@@ -45,15 +52,21 @@ function applyTheme(settings) {
   root.style.setProperty("--site-bg-image", `url("${settings.background_image || "/history-hero.svg"}")`);
   root.style.setProperty("--hero-image", `url("${settings.hero_image || settings.background_image || "/history-hero.svg"}")`);
   document.title = settings.site_title || "Archivo de Historia | Biblioteca Viva";
+  brandTitle.textContent = settings.site_title || "Biblioteca Viva de Historia";
+  brandKicker.textContent = settings.hero_kicker || "Archivo editorial";
 
   const leftRail = settings.left_rail_image || settings.background_image || "/history-hero.svg";
   const rightRail = settings.right_rail_image || settings.background_image || "/history-hero.svg";
   leftRailImage.style.backgroundImage = `url("${leftRail}")`;
   rightRailImage.style.backgroundImage = `url("${rightRail}")`;
+  leftRailImage.style.backgroundPosition = `center ${percent(settings.left_rail_position)}%`;
+  rightRailImage.style.backgroundPosition = `center ${percent(settings.right_rail_position)}%`;
 }
 
 function renderHero(settings) {
   const heroImage = settings.hero_image || settings.background_image || "/history-hero.svg";
+  const heroX = percent(settings.hero_position_x);
+  const heroY = percent(settings.hero_position_y);
 
   heroContainer.innerHTML = `
     <div class="hero-layout">
@@ -63,7 +76,7 @@ function renderHero(settings) {
         <p class="hero-text">${settings.hero_text || ""}</p>
       </div>
       <div class="hero-visual">
-        <img class="hero-image" src="${heroImage}" alt="${settings.hero_title || "Portada historica"}">
+        <img class="hero-image" src="${heroImage}" alt="${settings.hero_title || "Portada historica"}" style="object-position:${heroX}% ${heroY}%;">
       </div>
     </div>
   `;
@@ -159,9 +172,12 @@ function renderPosts() {
     const summaryText = String(post.summary || "");
     const contentText = String(post.content || "");
     const collapsedText = contentText.length > 180 ? `${contentText.slice(0, 180).trim()}...` : contentText;
+    const postX = percent(post.image_position_x);
+    const postY = percent(post.image_position_y);
 
     image.src = post.image_url || state.settings?.background_image || "/history-hero.svg";
     image.alt = post.title;
+    image.style.objectPosition = `${postX}% ${postY}%`;
     fragment.querySelector(".post-era").textContent = post.era || "Archivo";
     fragment.querySelector(".post-date").textContent = post.display_date;
     fragment.querySelector(".post-title").textContent = post.title;

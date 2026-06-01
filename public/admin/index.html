@@ -73,56 +73,71 @@
                 Texto de portada
                 <textarea id="hero_text" rows="4" required></textarea>
               </label>
-              <div class="dual-grid">
-                <label>
-                  Color base
-                  <input id="base_color" type="color">
+
+              <div class="color-grid">
+                <label class="color-card">
+                  <span>Color base</span>
+                  <div class="color-card-row">
+                    <input id="base_color" class="color-input" type="color" title="Haz clic para elegir el color base">
+                    <code id="base_color_value">#f5eddc</code>
+                  </div>
                 </label>
-                <label>
-                  Color de acento
-                  <input id="accent_color" type="color">
+                <label class="color-card">
+                  <span>Color de acento</span>
+                  <div class="color-card-row">
+                    <input id="accent_color" class="color-input" type="color" title="Haz clic para elegir el color de acento">
+                    <code id="accent_color_value">#caa35f</code>
+                  </div>
                 </label>
-              </div>
-              <div class="dual-grid">
-                <label>
-                  Tono secundario
-                  <input id="secondary_color" type="color">
+                <label class="color-card">
+                  <span>Tono secundario</span>
+                  <div class="color-card-row">
+                    <input id="secondary_color" class="color-input" type="color" title="Haz clic para elegir el tono secundario">
+                    <code id="secondary_color_value">#9eb8b2</code>
+                  </div>
                 </label>
-                <label>
-                  Color del texto
-                  <input id="ink_color" type="color">
+                <label class="color-card">
+                  <span>Color del texto</span>
+                  <div class="color-card-row">
+                    <input id="ink_color" class="color-input" type="color" title="Haz clic para elegir el color del texto">
+                    <code id="ink_color_value">#33241b</code>
+                  </div>
                 </label>
               </div>
 
               <div class="visual-guidance">
                 <p class="eyebrow">Laterales fijos</p>
-                <p>Sube una imagen para la izquierda y otra para la derecha. Recomendado: `480 x 1400 px` o mas, formato vertical. Se repetiran visualmente para que no se deformen.</p>
+                <p>Sube una imagen para la izquierda y otra para la derecha. Recomendado: `480 x 1400 px` o mas, formato vertical. Puedes mover el encuadre para elegir que parte se vea. Si una imagen ya no sirve, puedes quitarla.</p>
               </div>
 
-              <div class="triple-grid">
-                <div class="preview-block">
-                  <p class="preview-label">Fondo general</p>
-                  <div id="background_preview" class="image-preview image-preview-tall"></div>
-                  <label class="upload-box">
-                    Subir fondo
-                    <input id="background_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                  </label>
-                </div>
-                <div class="preview-block">
+              <div class="dual-grid">
+                <div class="preview-block preview-block-wide">
                   <p class="preview-label">Lateral izquierdo</p>
                   <div id="left_rail_preview" class="image-preview image-preview-rail"></div>
-                  <label class="upload-box">
-                    Subir lateral izquierdo
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar imagen izquierda</span>
                     <input id="left_rail_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <label>
+                    Encuadre vertical
+                    <input id="left_rail_position" type="range" min="0" max="100" value="50">
+                  </label>
+                  <button id="remove_left_rail" type="button" class="button button-secondary">Quitar imagen izquierda</button>
+                  <p class="preview-hint">Recomendado: `480 x 1400 px` o mas.</p>
                 </div>
-                <div class="preview-block">
+                <div class="preview-block preview-block-wide">
                   <p class="preview-label">Lateral derecho</p>
                   <div id="right_rail_preview" class="image-preview image-preview-rail"></div>
-                  <label class="upload-box">
-                    Subir lateral derecho
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar imagen derecha</span>
                     <input id="right_rail_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <label>
+                    Encuadre vertical
+                    <input id="right_rail_position" type="range" min="0" max="100" value="50">
+                  </label>
+                  <button id="remove_right_rail" type="button" class="button button-secondary">Quitar imagen derecha</button>
+                  <p class="preview-hint">Recomendado: `480 x 1400 px` o mas.</p>
                 </div>
               </div>
 
@@ -130,10 +145,19 @@
                 <div class="preview-block">
                   <p class="preview-label">Imagen principal de portada</p>
                   <div id="hero_preview" class="image-preview image-preview-wide"></div>
-                  <label class="upload-box">
-                    Subir portada
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar portada</span>
                     <input id="hero_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <label>
+                    Encuadre horizontal
+                    <input id="hero_position_x" type="range" min="0" max="100" value="50">
+                  </label>
+                  <label>
+                    Encuadre vertical
+                    <input id="hero_position_y" type="range" min="0" max="100" value="50">
+                  </label>
+                  <button id="remove_hero_image" type="button" class="button button-secondary">Quitar portada</button>
                   <p class="preview-hint">Recomendado: `1400 x 900 px`.</p>
                 </div>
                 <div class="preview-block">
@@ -146,6 +170,16 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="preview-block preview-block-wide">
+                <p class="preview-label">Fondo general del sitio</p>
+                <p class="preview-hint">Esta imagen se usa como atmósfera general detrás de la página. Si no se ve mucho, es normal porque va con transparencia para no estorbar la lectura.</p>
+                <label class="upload-box upload-box-compact">
+                  <span class="upload-trigger">Seleccionar fondo general</span>
+                  <input id="background_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                </label>
+                <button id="remove_background_image" type="button" class="button button-secondary">Quitar fondo general</button>
               </div>
 
               <button type="submit" class="button">Guardar apariencia</button>
@@ -231,28 +265,39 @@
                 <div class="preview-block">
                   <p class="preview-label">Imagen principal del articulo</p>
                   <div id="post_main_preview" class="image-preview image-preview-wide"></div>
-                  <label class="upload-box">
-                    Subir imagen principal
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar imagen principal</span>
                     <input id="post_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <label>
+                    Encuadre horizontal
+                    <input id="post_position_x" type="range" min="0" max="100" value="50">
+                  </label>
+                  <label>
+                    Encuadre vertical
+                    <input id="post_position_y" type="range" min="0" max="100" value="50">
+                  </label>
+                  <button id="remove_post_image" type="button" class="button button-secondary">Quitar imagen principal</button>
                   <p class="preview-hint">Recomendado: `1200 x 720 px`.</p>
                 </div>
                 <div class="preview-block">
                   <p class="preview-label">Imagen de apoyo 1</p>
                   <div id="post_extra_1_preview" class="image-preview image-preview-square"></div>
-                  <label class="upload-box">
-                    Subir apoyo 1
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar apoyo 1</span>
                     <input id="post_upload_2" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <button id="remove_post_image_2" type="button" class="button button-secondary">Quitar apoyo 1</button>
                   <p class="preview-hint">Recomendado: `1000 x 1000 px`.</p>
                 </div>
                 <div class="preview-block">
                   <p class="preview-label">Imagen de apoyo 2</p>
                   <div id="post_extra_2_preview" class="image-preview image-preview-square"></div>
-                  <label class="upload-box">
-                    Subir apoyo 2
+                  <label class="upload-box upload-box-compact">
+                    <span class="upload-trigger">Seleccionar apoyo 2</span>
                     <input id="post_upload_3" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                   </label>
+                  <button id="remove_post_image_3" type="button" class="button button-secondary">Quitar apoyo 2</button>
                   <p class="preview-hint">Recomendado: `1000 x 1000 px`.</p>
                 </div>
               </div>

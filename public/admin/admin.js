@@ -1,4 +1,4 @@
-import { BUCKET_NAME, supabase, uploadImage } from "/lib/supabase-browser.js";
+import { BUCKET_NAME, deleteImageByUrl, supabase, uploadImage } from "/lib/supabase-browser.js";
 
 const loginScreen = document.getElementById("login-screen");
 const adminScreen = document.getElementById("admin-screen");
@@ -25,7 +25,6 @@ const previewKicker = document.getElementById("preview_kicker");
 const previewTitle = document.getElementById("preview_title");
 const previewText = document.getElementById("preview_text");
 const heroPreview = document.getElementById("hero_preview");
-const backgroundPreview = document.getElementById("background_preview");
 const leftRailPreview = document.getElementById("left_rail_preview");
 const rightRailPreview = document.getElementById("right_rail_preview");
 const postMainPreview = document.getElementById("post_main_preview");
@@ -52,6 +51,19 @@ function showLogin() {
 function setPreviewImage(node, url) {
   node.style.backgroundImage = url ? `url("${url}")` : "none";
   node.classList.toggle("is-empty", !url);
+}
+
+function percentValue(id, fallback = 50) {
+  const value = Number(document.getElementById(id).value);
+  return Number.isFinite(value) ? value : fallback;
+}
+
+function updateColorValue(id) {
+  document.getElementById(`${id}_value`).textContent = document.getElementById(id).value;
+}
+
+function updatePreviewPosition(node, x, y) {
+  node.style.backgroundPosition = `${x}% ${y}%`;
 }
 
 function applySettingsTheme(settings) {
@@ -119,16 +131,24 @@ function fillSettings(settings) {
   document.getElementById("accent_color").value = defaults.accent_color || "#caa35f";
   document.getElementById("secondary_color").value = defaults.secondary_color || "#9eb8b2";
   document.getElementById("ink_color").value = defaults.ink_color || "#33241b";
+  document.getElementById("left_rail_position").value = defaults.left_rail_position ?? 50;
+  document.getElementById("right_rail_position").value = defaults.right_rail_position ?? 50;
+  document.getElementById("hero_position_x").value = defaults.hero_position_x ?? 50;
+  document.getElementById("hero_position_y").value = defaults.hero_position_y ?? 50;
 
   settingsForm.dataset.backgroundImage = defaults.background_image || "";
   settingsForm.dataset.heroImage = defaults.hero_image || "";
   settingsForm.dataset.leftRailImage = defaults.left_rail_image || "";
   settingsForm.dataset.rightRailImage = defaults.right_rail_image || "";
 
-  setPreviewImage(backgroundPreview, defaults.background_image || "");
   setPreviewImage(heroPreview, defaults.hero_image || "");
   setPreviewImage(leftRailPreview, defaults.left_rail_image || "");
   setPreviewImage(rightRailPreview, defaults.right_rail_image || "");
+  updatePreviewPosition(heroPreview, defaults.hero_position_x ?? 50, defaults.hero_position_y ?? 50);
+  updatePreviewPosition(leftRailPreview, 50, defaults.left_rail_position ?? 50);
+  updatePreviewPosition(rightRailPreview, 50, defaults.right_rail_position ?? 50);
+
+  ["base_color", "accent_color", "secondary_color", "ink_color"].forEach(updateColorValue);
   refreshStylePreview();
 }
 
@@ -141,12 +161,15 @@ function resetSectionForm() {
 function resetPostForm() {
   postForm.reset();
   document.getElementById("post_id").value = "";
+  document.getElementById("post_position_x").value = 50;
+  document.getElementById("post_position_y").value = 50;
   postForm.dataset.mainImage = "";
   postForm.dataset.extraImage1 = "";
   postForm.dataset.extraImage2 = "";
   setPreviewImage(postMainPreview, "");
   setPreviewImage(postExtra1Preview, "");
   setPreviewImage(postExtra2Preview, "");
+  updatePreviewPosition(postMainPreview, 50, 50);
 }
 
 function renderSections() {
@@ -215,6 +238,8 @@ function renderPosts() {
       document.getElementById("post_era").value = post.era || "";
       document.getElementById("post_content").value = post.content;
       document.getElementById("post_featured").checked = Boolean(post.featured);
+      document.getElementById("post_position_x").value = post.image_position_x ?? 50;
+      document.getElementById("post_position_y").value = post.image_position_y ?? 50;
 
       postForm.dataset.mainImage = post.image_url || "";
       postForm.dataset.extraImage1 = post.image_url_2 || "";
@@ -222,6 +247,7 @@ function renderPosts() {
       setPreviewImage(postMainPreview, post.image_url || "");
       setPreviewImage(postExtra1Preview, post.image_url_2 || "");
       setPreviewImage(postExtra2Preview, post.image_url_3 || "");
+      updatePreviewPosition(postMainPreview, post.image_position_x ?? 50, post.image_position_y ?? 50);
 
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
@@ -263,6 +289,19 @@ function bindLocalPreview(fileInputId, previewNode) {
   });
 }
 
+async function removeStoredImage(url, statusNode) {
+  if (!url) {
+    return;
+  }
+
+  try {
+    await deleteImageByUrl(url);
+    setStatus(statusNode, "Imagen eliminada.");
+  } catch (error) {
+    setStatus(statusNode, `No se pudo eliminar la imagen del storage: ${error.message}`);
+  }
+}
+
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const email = document.getElementById("email").value.trim();
@@ -286,13 +325,37 @@ logoutButton.addEventListener("click", async () => {
 });
 
 ["site_title", "hero_kicker", "hero_title", "hero_text", "base_color", "accent_color", "secondary_color", "ink_color"]
-  .forEach((id) => document.getElementById(id).addEventListener("input", refreshStylePreview));
+  .forEach((id) => document.getElementById(id).addEventListener("input", () => {
+    if (id.endsWith("_color")) {
+      updateColorValue(id);
+    }
+    refreshStylePreview();
+  }));
+
+document.getElementById("hero_position_x").addEventListener("input", () => {
+  updatePreviewPosition(heroPreview, percentValue("hero_position_x"), percentValue("hero_position_y"));
+});
+document.getElementById("hero_position_y").addEventListener("input", () => {
+  updatePreviewPosition(heroPreview, percentValue("hero_position_x"), percentValue("hero_position_y"));
+});
+document.getElementById("left_rail_position").addEventListener("input", () => {
+  updatePreviewPosition(leftRailPreview, 50, percentValue("left_rail_position"));
+});
+document.getElementById("right_rail_position").addEventListener("input", () => {
+  updatePreviewPosition(rightRailPreview, 50, percentValue("right_rail_position"));
+});
+document.getElementById("post_position_x").addEventListener("input", () => {
+  updatePreviewPosition(postMainPreview, percentValue("post_position_x"), percentValue("post_position_y"));
+});
+document.getElementById("post_position_y").addEventListener("input", () => {
+  updatePreviewPosition(postMainPreview, percentValue("post_position_x"), percentValue("post_position_y"));
+});
 
 settingsForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   try {
-    const backgroundImage = await maybeUpload("background_upload", "backgrounds", settingsStatus, backgroundPreview)
+    const backgroundImage = await maybeUpload("background_upload", "backgrounds", settingsStatus, heroPreview)
       || settingsForm.dataset.backgroundImage || "";
     const heroImage = await maybeUpload("hero_upload", "hero", settingsStatus, heroPreview)
       || settingsForm.dataset.heroImage || "";
@@ -313,8 +376,12 @@ settingsForm.addEventListener("submit", async (event) => {
       ink_color: document.getElementById("ink_color").value,
       background_image: backgroundImage,
       hero_image: heroImage,
+      hero_position_x: percentValue("hero_position_x"),
+      hero_position_y: percentValue("hero_position_y"),
       left_rail_image: leftRailImageUrl,
-      right_rail_image: rightRailImageUrl
+      right_rail_image: rightRailImageUrl,
+      left_rail_position: percentValue("left_rail_position"),
+      right_rail_position: percentValue("right_rail_position")
     };
 
     const { error } = await supabase.from("site_settings").upsert(payload, { onConflict: "id" });
@@ -379,6 +446,8 @@ postForm.addEventListener("submit", async (event) => {
       image_url_2: imageUrl2,
       image_url_3: imageUrl3,
       gallery_urls: [imageUrl2, imageUrl3].filter(Boolean).join(","),
+      image_position_x: percentValue("post_position_x"),
+      image_position_y: percentValue("post_position_y"),
       content: document.getElementById("post_content").value.trim(),
       featured: document.getElementById("post_featured").checked
     };
@@ -399,7 +468,55 @@ postForm.addEventListener("submit", async (event) => {
 clearSectionButton.addEventListener("click", resetSectionForm);
 clearPostButton.addEventListener("click", resetPostForm);
 
-bindLocalPreview("background_upload", backgroundPreview);
+document.getElementById("remove_background_image").addEventListener("click", async () => {
+  await removeStoredImage(settingsForm.dataset.backgroundImage, settingsStatus);
+  settingsForm.dataset.backgroundImage = "";
+  setStatus(settingsStatus, "Fondo general quitado. Guarda apariencia para reflejar el cambio.");
+});
+
+document.getElementById("remove_hero_image").addEventListener("click", async () => {
+  await removeStoredImage(settingsForm.dataset.heroImage, settingsStatus);
+  settingsForm.dataset.heroImage = "";
+  setPreviewImage(heroPreview, "");
+  setStatus(settingsStatus, "Portada quitada. Guarda apariencia para reflejar el cambio.");
+});
+
+document.getElementById("remove_left_rail").addEventListener("click", async () => {
+  await removeStoredImage(settingsForm.dataset.leftRailImage, settingsStatus);
+  settingsForm.dataset.leftRailImage = "";
+  setPreviewImage(leftRailPreview, "");
+  setStatus(settingsStatus, "Imagen izquierda quitada. Guarda apariencia para reflejar el cambio.");
+});
+
+document.getElementById("remove_right_rail").addEventListener("click", async () => {
+  await removeStoredImage(settingsForm.dataset.rightRailImage, settingsStatus);
+  settingsForm.dataset.rightRailImage = "";
+  setPreviewImage(rightRailPreview, "");
+  setStatus(settingsStatus, "Imagen derecha quitada. Guarda apariencia para reflejar el cambio.");
+});
+
+document.getElementById("remove_post_image").addEventListener("click", async () => {
+  await removeStoredImage(postForm.dataset.mainImage, postStatus);
+  postForm.dataset.mainImage = "";
+  setPreviewImage(postMainPreview, "");
+  setStatus(postStatus, "Imagen principal quitada. Guarda el articulo para reflejar el cambio.");
+});
+
+document.getElementById("remove_post_image_2").addEventListener("click", async () => {
+  await removeStoredImage(postForm.dataset.extraImage1, postStatus);
+  postForm.dataset.extraImage1 = "";
+  setPreviewImage(postExtra1Preview, "");
+  setStatus(postStatus, "Imagen de apoyo 1 quitada. Guarda el articulo para reflejar el cambio.");
+});
+
+document.getElementById("remove_post_image_3").addEventListener("click", async () => {
+  await removeStoredImage(postForm.dataset.extraImage2, postStatus);
+  postForm.dataset.extraImage2 = "";
+  setPreviewImage(postExtra2Preview, "");
+  setStatus(postStatus, "Imagen de apoyo 2 quitada. Guarda el articulo para reflejar el cambio.");
+});
+
+bindLocalPreview("background_upload", heroPreview);
 bindLocalPreview("hero_upload", heroPreview);
 bindLocalPreview("left_rail_upload", leftRailPreview);
 bindLocalPreview("right_rail_upload", rightRailPreview);

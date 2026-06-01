@@ -51,13 +51,8 @@ body {
   pointer-events: none;
 }
 
-.side-rail-left {
-  left: 0;
-}
-
-.side-rail-right {
-  right: 0;
-}
+.side-rail-left { left: 0; }
+.side-rail-right { right: 0; }
 
 .side-rail-image {
   height: 100%;
@@ -210,7 +205,8 @@ select,
 button,
 .preview-hint,
 .visual-guidance p,
-.entity-summary {
+.entity-summary,
+code {
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -273,6 +269,10 @@ select {
   font-family: inherit;
 }
 
+input[type="range"] {
+  padding: 0;
+}
+
 textarea {
   resize: vertical;
 }
@@ -306,7 +306,9 @@ textarea {
 .upload-row,
 .dual-grid,
 .toggle-row,
-.triple-grid {
+.triple-grid,
+.color-grid,
+.color-card-row {
   display: flex;
   gap: 12px;
 }
@@ -445,6 +447,29 @@ textarea {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.color-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 251, 244, 0.64);
+  padding: 14px;
+}
+
+.color-card-row {
+  align-items: center;
+}
+
+.color-input {
+  height: 56px;
+  padding: 0;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
 .toggle-row {
   align-items: center;
 }
@@ -456,6 +481,25 @@ textarea {
 .upload-box {
   display: grid;
   gap: 8px;
+}
+
+.upload-box-compact input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.upload-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--line);
+  background: rgba(255, 253, 248, 0.92);
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .entity-list {
@@ -496,6 +540,10 @@ textarea {
   padding: 16px;
 }
 
+.preview-block-wide {
+  min-width: 0;
+}
+
 .image-preview {
   width: 100%;
   border-radius: 18px;
@@ -505,6 +553,7 @@ textarea {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  margin-bottom: 12px;
 }
 
 .image-preview.is-empty::after {
@@ -516,16 +565,12 @@ textarea {
   color: color-mix(in srgb, var(--ink) 52%, white);
 }
 
-.image-preview-tall {
-  min-height: 220px;
-}
-
 .image-preview-rail {
-  min-height: 220px;
+  min-height: 260px;
 }
 
 .image-preview-wide {
-  min-height: 160px;
+  min-height: 220px;
 }
 
 .image-preview-square {
@@ -583,7 +628,8 @@ textarea {
   .admin-layout,
   .dual-grid,
   .triple-grid,
-  .post-gallery {
+  .post-gallery,
+  .color-grid {
     grid-template-columns: 1fr;
   }
 
