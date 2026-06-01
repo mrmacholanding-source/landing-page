@@ -10,6 +10,8 @@ alter table public.site_settings
   add column if not exists hero_position_x integer default 50,
   add column if not exists hero_position_y integer default 50,
   add column if not exists hero_zoom integer default 100,
+  add column if not exists intro_left_label text default '',
+  add column if not exists intro_right_label text default '',
   add column if not exists intro_left_title text default '',
   add column if not exists intro_left_text text default '',
   add column if not exists intro_right_title text default '',
