@@ -11,6 +11,13 @@
   </head>
   <body data-view="public">
     <div class="site-bg-overlay"></div>
+    <aside class="side-rail side-rail-left">
+      <div id="left-rail-image" class="side-rail-image"></div>
+    </aside>
+    <aside class="side-rail side-rail-right">
+      <div id="right-rail-image" class="side-rail-image"></div>
+    </aside>
+
     <header class="topbar">
       <div class="brand-lockup">
         <p class="brand-kicker">Archivo editorial</p>
@@ -71,10 +78,6 @@
       </div>
     </template>
 
-    <template id="section-pill-template">
-      <button class="timeline-pill" type="button"></button>
-    </template>
-
     <template id="post-template">
       <article class="post-card panel">
         <div class="post-media-wrap">
@@ -86,7 +89,10 @@
         </div>
         <h3 class="post-title"></h3>
         <p class="post-summary"></p>
-        <p class="post-content"></p>
+        <div class="post-content-collapsed"></div>
+        <button class="post-toggle" type="button">Ver texto completo</button>
+        <div class="post-content-full hidden"></div>
+        <div class="post-gallery hidden"></div>
         <p class="post-source"></p>
       </article>
     </template>

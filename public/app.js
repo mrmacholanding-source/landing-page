@@ -1,13 +1,14 @@
 import { supabase } from "/lib/supabase-browser.js";
 
 const heroContainer = document.getElementById("hero");
-const heroTemplate = document.getElementById("hero-template");
 const navContainer = document.getElementById("main-nav");
 const timelineContainer = document.getElementById("timeline-menu");
 const postsGrid = document.getElementById("posts-grid");
 const postTemplate = document.getElementById("post-template");
 const sectionFilter = document.getElementById("section-filter");
 const postsTitle = document.getElementById("posts-title");
+const leftRailImage = document.getElementById("left-rail-image");
+const rightRailImage = document.getElementById("right-rail-image");
 
 let state = {
   settings: null,
@@ -15,6 +16,21 @@ let state = {
   posts: [],
   activeSection: "all"
 };
+
+function safeSplitGallery(value) {
+  if (!value) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.filter(Boolean);
+  }
+
+  return String(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
 
 function applyTheme(settings) {
   if (!settings) {
@@ -29,20 +45,28 @@ function applyTheme(settings) {
   root.style.setProperty("--site-bg-image", `url("${settings.background_image || "/history-hero.svg"}")`);
   root.style.setProperty("--hero-image", `url("${settings.hero_image || settings.background_image || "/history-hero.svg"}")`);
   document.title = settings.site_title || "Archivo de Historia | Biblioteca Viva";
+
+  const leftRail = settings.left_rail_image || settings.background_image || "/history-hero.svg";
+  const rightRail = settings.right_rail_image || settings.background_image || "/history-hero.svg";
+  leftRailImage.style.backgroundImage = `url("${leftRail}")`;
+  rightRailImage.style.backgroundImage = `url("${rightRail}")`;
 }
 
 function renderHero(settings) {
-  const fragment = heroTemplate.content.cloneNode(true);
-  fragment.querySelector(".hero-kicker").textContent = settings.hero_kicker || "Archivo editorial";
-  fragment.querySelector(".hero-title").textContent = settings.hero_title || settings.site_title || "Biblioteca Viva";
-  fragment.querySelector(".hero-text").textContent = settings.hero_text || "";
+  const heroImage = settings.hero_image || settings.background_image || "/history-hero.svg";
 
-  const heroImage = fragment.querySelector(".hero-image");
-  heroImage.src = settings.hero_image || settings.background_image || "/history-hero.svg";
-  heroImage.alt = settings.hero_title || "Portada historica";
-
-  heroContainer.innerHTML = "";
-  heroContainer.appendChild(fragment);
+  heroContainer.innerHTML = `
+    <div class="hero-layout">
+      <div class="hero-copy">
+        <p class="eyebrow hero-kicker">${settings.hero_kicker || "Archivo editorial"}</p>
+        <h1 class="hero-title">${settings.hero_title || settings.site_title || "Biblioteca Viva"}</h1>
+        <p class="hero-text">${settings.hero_text || ""}</p>
+      </div>
+      <div class="hero-visual">
+        <img class="hero-image" src="${heroImage}" alt="${settings.hero_title || "Portada historica"}">
+      </div>
+    </div>
+  `;
 }
 
 function renderSections(sections) {
@@ -68,7 +92,7 @@ function renderSections(sections) {
     const pill = document.createElement("button");
     pill.type = "button";
     pill.className = `timeline-pill ${state.activeSection === section.id ? "is-active" : ""}`;
-    pill.textContent = `${section.name} · ${section.description}`;
+    pill.textContent = `${section.name} - ${section.description}`;
     pill.addEventListener("click", () => setActiveSection(section.id));
     timelineContainer.appendChild(pill);
 
@@ -79,6 +103,34 @@ function renderSections(sections) {
   });
 
   sectionFilter.value = state.activeSection;
+}
+
+function createParagraphs(text) {
+  return String(text || "")
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+function renderPostGallery(container, urls) {
+  container.innerHTML = "";
+
+  if (!urls.length) {
+    container.classList.add("hidden");
+    return;
+  }
+
+  urls.forEach((url, index) => {
+    const img = document.createElement("img");
+    img.src = url;
+    img.alt = `Imagen complementaria ${index + 1}`;
+    img.className = "post-gallery-image";
+    container.appendChild(img);
+  });
+
+  container.classList.remove("hidden");
 }
 
 function renderPosts() {
@@ -99,14 +151,39 @@ function renderPosts() {
   filtered.forEach((post) => {
     const fragment = postTemplate.content.cloneNode(true);
     const image = fragment.querySelector(".post-media");
+    const collapsed = fragment.querySelector(".post-content-collapsed");
+    const full = fragment.querySelector(".post-content-full");
+    const toggle = fragment.querySelector(".post-toggle");
+    const gallery = fragment.querySelector(".post-gallery");
+    const galleryUrls = safeSplitGallery(post.gallery_urls);
+    const summaryText = String(post.summary || "");
+    const contentText = String(post.content || "");
+    const collapsedText = contentText.length > 180 ? `${contentText.slice(0, 180).trim()}...` : contentText;
+
     image.src = post.image_url || state.settings?.background_image || "/history-hero.svg";
     image.alt = post.title;
     fragment.querySelector(".post-era").textContent = post.era || "Archivo";
     fragment.querySelector(".post-date").textContent = post.display_date;
     fragment.querySelector(".post-title").textContent = post.title;
-    fragment.querySelector(".post-summary").textContent = post.summary;
-    fragment.querySelector(".post-content").textContent = post.content;
+    fragment.querySelector(".post-summary").textContent = summaryText;
+    collapsed.textContent = collapsedText;
+    full.innerHTML = createParagraphs(contentText);
     fragment.querySelector(".post-source").textContent = post.source ? `Fuente: ${post.source}` : "Fuente no especificada";
+
+    renderPostGallery(gallery, galleryUrls);
+
+    if (contentText.length <= 180 && galleryUrls.length === 0) {
+      toggle.classList.add("hidden");
+    } else {
+      toggle.addEventListener("click", () => {
+        const isOpen = full.classList.contains("hidden") === false;
+        full.classList.toggle("hidden", isOpen);
+        gallery.classList.toggle("hidden", isOpen || galleryUrls.length === 0);
+        collapsed.classList.toggle("hidden", !isOpen);
+        toggle.textContent = isOpen ? "Ver texto completo" : "Ocultar texto";
+      });
+    }
+
     postsGrid.appendChild(fragment);
   });
 }

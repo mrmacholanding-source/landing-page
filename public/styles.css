@@ -41,6 +41,32 @@ body {
   opacity: 0.42;
 }
 
+.side-rail {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: max(calc((100vw - min(1220px, calc(100% - 28px))) / 2 - 18px), 0px);
+  min-width: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.side-rail-left {
+  left: 0;
+}
+
+.side-rail-right {
+  right: 0;
+}
+
+.side-rail-image {
+  height: 100%;
+  background-position: center top;
+  background-size: cover;
+  background-repeat: repeat-y;
+  opacity: 0.58;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -70,7 +96,8 @@ img {
 
 .brand-kicker,
 .eyebrow,
-.entity-kicker {
+.entity-kicker,
+.preview-label {
   margin: 0 0 6px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -168,17 +195,22 @@ h3 {
   font-size: clamp(2.5rem, 5vw, 5rem);
   line-height: 0.95;
   margin: 0 0 12px;
+  overflow-wrap: anywhere;
 }
 
 .hero-text,
 .post-summary,
-.post-content,
+.post-content-collapsed,
+.post-content-full,
 .status-text,
 label,
 input,
 textarea,
 select,
-button {
+button,
+.preview-hint,
+.visual-guidance p,
+.entity-summary {
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -273,7 +305,8 @@ textarea {
 .admin-header-actions,
 .upload-row,
 .dual-grid,
-.toggle-row {
+.toggle-row,
+.triple-grid {
   display: flex;
   gap: 12px;
 }
@@ -281,8 +314,11 @@ textarea {
 .post-meta,
 .post-title,
 .post-summary,
-.post-content,
-.post-source {
+.post-content-collapsed,
+.post-content-full,
+.post-source,
+.post-toggle,
+.post-gallery {
   margin-left: 24px;
   margin-right: 24px;
 }
@@ -292,14 +328,58 @@ textarea {
   flex-wrap: wrap;
 }
 
+.post-title,
+.post-summary,
+.post-content-collapsed,
+.post-content-full {
+  overflow-wrap: anywhere;
+}
+
 .post-title {
   margin-top: 10px;
   margin-bottom: 10px;
 }
 
+.post-content-collapsed {
+  max-height: 8.6em;
+  overflow: hidden;
+}
+
+.post-toggle {
+  margin-top: 10px;
+  align-self: start;
+  background: transparent;
+  border: none;
+  color: color-mix(in srgb, var(--accent) 82%, #63431a);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.post-content-full p {
+  margin-top: 0;
+}
+
+.post-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.post-gallery-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+}
+
 .post-source,
 .status-text,
-.entity-summary {
+.entity-summary,
+.preview-hint,
+.visual-guidance p {
   color: color-mix(in srgb, var(--ink) 68%, white);
 }
 
@@ -360,6 +440,11 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.triple-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .toggle-row {
   align-items: center;
 }
@@ -393,6 +478,7 @@ textarea {
 .entity-title,
 .entity-summary {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .empty-state {
@@ -400,6 +486,86 @@ textarea {
   border-radius: 20px;
   padding: 22px;
   background: rgba(255, 251, 244, 0.5);
+}
+
+.preview-block,
+.visual-guidance {
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255, 251, 244, 0.55);
+  padding: 16px;
+}
+
+.image-preview {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px dashed var(--line);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(243, 235, 221, 0.86));
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.image-preview.is-empty::after {
+  content: "Vista previa";
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: inherit;
+  color: color-mix(in srgb, var(--ink) 52%, white);
+}
+
+.image-preview-tall {
+  min-height: 220px;
+}
+
+.image-preview-rail {
+  min-height: 220px;
+}
+
+.image-preview-wide {
+  min-height: 160px;
+}
+
+.image-preview-square {
+  min-height: 180px;
+}
+
+.style-live-preview {
+  border-radius: 18px;
+  min-height: 260px;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--bg) 88%, white), var(--bg));
+  color: var(--ink);
+}
+
+.style-preview-hero {
+  height: 100%;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 252, 246, 0.94));
+}
+
+.style-preview-hero span,
+.style-preview-hero strong,
+.style-preview-hero p {
+  display: block;
+}
+
+.style-preview-hero strong {
+  font-family: "Cinzel", serif;
+  font-size: 1.5rem;
+  margin: 10px 0;
+}
+
+@media (max-width: 1320px) {
+  .side-rail {
+    display: none;
+  }
 }
 
 @media (max-width: 960px) {
@@ -415,7 +581,9 @@ textarea {
   .posts-grid,
   .auth-card,
   .admin-layout,
-  .dual-grid {
+  .dual-grid,
+  .triple-grid,
+  .post-gallery {
     grid-template-columns: 1fr;
   }
 

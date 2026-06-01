@@ -93,24 +93,61 @@
                   <input id="ink_color" type="color">
                 </label>
               </div>
-              <label>
-                Imagen de fondo del sitio
-                <input id="background_image" placeholder="https://...">
-              </label>
-              <label>
-                Imagen principal de portada
-                <input id="hero_image" placeholder="https://...">
-              </label>
-              <div class="upload-row">
-                <label class="upload-box">
-                  Subir imagen de fondo
-                  <input id="background_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                </label>
-                <label class="upload-box">
-                  Subir imagen de portada
-                  <input id="hero_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                </label>
+
+              <div class="visual-guidance">
+                <p class="eyebrow">Laterales fijos</p>
+                <p>Sube una imagen para la izquierda y otra para la derecha. Recomendado: `480 x 1400 px` o mas, formato vertical. Se repetiran visualmente para que no se deformen.</p>
               </div>
+
+              <div class="triple-grid">
+                <div class="preview-block">
+                  <p class="preview-label">Fondo general</p>
+                  <div id="background_preview" class="image-preview image-preview-tall"></div>
+                  <label class="upload-box">
+                    Subir fondo
+                    <input id="background_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                </div>
+                <div class="preview-block">
+                  <p class="preview-label">Lateral izquierdo</p>
+                  <div id="left_rail_preview" class="image-preview image-preview-rail"></div>
+                  <label class="upload-box">
+                    Subir lateral izquierdo
+                    <input id="left_rail_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                </div>
+                <div class="preview-block">
+                  <p class="preview-label">Lateral derecho</p>
+                  <div id="right_rail_preview" class="image-preview image-preview-rail"></div>
+                  <label class="upload-box">
+                    Subir lateral derecho
+                    <input id="right_rail_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                </div>
+              </div>
+
+              <div class="dual-grid">
+                <div class="preview-block">
+                  <p class="preview-label">Imagen principal de portada</p>
+                  <div id="hero_preview" class="image-preview image-preview-wide"></div>
+                  <label class="upload-box">
+                    Subir portada
+                    <input id="hero_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                  <p class="preview-hint">Recomendado: `1400 x 900 px`.</p>
+                </div>
+                <div class="preview-block">
+                  <p class="preview-label">Vista previa del estilo</p>
+                  <div id="style_live_preview" class="style-live-preview">
+                    <div class="style-preview-hero">
+                      <span id="preview_kicker">Archivo editorial</span>
+                      <strong id="preview_title">Biblioteca Viva de Historia</strong>
+                      <p id="preview_text">Archivo visual y editorial para historia, libros, revistas y fuentes.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <button type="submit" class="button">Guardar apariencia</button>
               <p id="settings-status" class="status-text"></p>
             </form>
@@ -189,18 +226,42 @@
                   <input id="post_era" placeholder="Edad Media, Antiguedad, etc.">
                 </label>
               </div>
-              <label>
-                Imagen del articulo
-                <input id="post_image" placeholder="https://...">
-              </label>
-              <label class="upload-box">
-                Subir imagen del articulo
-                <input id="post_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-              </label>
+
+              <div class="triple-grid">
+                <div class="preview-block">
+                  <p class="preview-label">Imagen principal del articulo</p>
+                  <div id="post_main_preview" class="image-preview image-preview-wide"></div>
+                  <label class="upload-box">
+                    Subir imagen principal
+                    <input id="post_upload" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                  <p class="preview-hint">Recomendado: `1200 x 720 px`.</p>
+                </div>
+                <div class="preview-block">
+                  <p class="preview-label">Imagen de apoyo 1</p>
+                  <div id="post_extra_1_preview" class="image-preview image-preview-square"></div>
+                  <label class="upload-box">
+                    Subir apoyo 1
+                    <input id="post_upload_2" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                  <p class="preview-hint">Recomendado: `1000 x 1000 px`.</p>
+                </div>
+                <div class="preview-block">
+                  <p class="preview-label">Imagen de apoyo 2</p>
+                  <div id="post_extra_2_preview" class="image-preview image-preview-square"></div>
+                  <label class="upload-box">
+                    Subir apoyo 2
+                    <input id="post_upload_3" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                  </label>
+                  <p class="preview-hint">Recomendado: `1000 x 1000 px`.</p>
+                </div>
+              </div>
+
               <label>
                 Contenido
-                <textarea id="post_content" rows="8" required></textarea>
+                <textarea id="post_content" rows="10" required></textarea>
               </label>
+              <p class="preview-hint">El contenido en la portada se mostrara resumido con boton para expandir.</p>
               <label class="toggle-row">
                 <input id="post_featured" type="checkbox">
                 Destacar en portada
