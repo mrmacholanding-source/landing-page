@@ -11,6 +11,10 @@ const leftRailImage = document.getElementById("left-rail-image");
 const rightRailImage = document.getElementById("right-rail-image");
 const brandTitle = document.getElementById("brand-title");
 const brandKicker = document.getElementById("brand-kicker");
+const introLeftTitle = document.getElementById("intro-left-title");
+const introLeftText = document.getElementById("intro-left-text");
+const introRightTitle = document.getElementById("intro-right-title");
+const introRightText = document.getElementById("intro-right-text");
 
 let state = {
   settings: null,
@@ -34,9 +38,9 @@ function safeSplitGallery(value) {
     .filter(Boolean);
 }
 
-function percent(value, fallback = 50) {
-  const number = Number(value);
-  return Number.isFinite(number) ? number : fallback;
+function toNumber(value, fallback = 50) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function applyTheme(settings) {
@@ -51,22 +55,30 @@ function applyTheme(settings) {
   root.style.setProperty("--ink", settings.ink_color || "#33241b");
   root.style.setProperty("--site-bg-image", `url("${settings.background_image || "/history-hero.svg"}")`);
   root.style.setProperty("--hero-image", `url("${settings.hero_image || settings.background_image || "/history-hero.svg"}")`);
+
   document.title = settings.site_title || "Archivo de Historia | Biblioteca Viva";
   brandTitle.textContent = settings.site_title || "Biblioteca Viva de Historia";
   brandKicker.textContent = settings.hero_kicker || "Archivo editorial";
+  introLeftTitle.textContent = settings.intro_left_title || "Un blog para libros, revistas, fuentes y memoria historica";
+  introLeftText.textContent = settings.intro_left_text || "Este espacio organiza articulos, referencias e imagenes en una experiencia visual clara, adaptable a telefono y computador, con un aire de manuscrito iluminado pero lenguaje contemporaneo.";
+  introRightTitle.textContent = settings.intro_right_title || "Recorridos por edades, fechas y temas";
+  introRightText.textContent = settings.intro_right_text || "El menu inicial puede ordenar el contenido por periodos historicos, civilizaciones, siglos o temas editoriales, todo editable desde el panel de administracion.";
 
-  const leftRail = settings.left_rail_image || settings.background_image || "/history-hero.svg";
-  const rightRail = settings.right_rail_image || settings.background_image || "/history-hero.svg";
+  const leftRail = settings.left_rail_image || "/history-hero.svg";
+  const rightRail = settings.right_rail_image || "/history-hero.svg";
   leftRailImage.style.backgroundImage = `url("${leftRail}")`;
   rightRailImage.style.backgroundImage = `url("${rightRail}")`;
-  leftRailImage.style.backgroundPosition = `center ${percent(settings.left_rail_position)}%`;
-  rightRailImage.style.backgroundPosition = `center ${percent(settings.right_rail_position)}%`;
+  leftRailImage.style.backgroundPosition = `${toNumber(settings.left_rail_position_x)}% ${toNumber(settings.left_rail_position_y)}%`;
+  rightRailImage.style.backgroundPosition = `${toNumber(settings.right_rail_position_x)}% ${toNumber(settings.right_rail_position_y)}%`;
+  leftRailImage.style.backgroundSize = `${toNumber(settings.left_rail_zoom, 100)}%`;
+  rightRailImage.style.backgroundSize = `${toNumber(settings.right_rail_zoom, 100)}%`;
 }
 
 function renderHero(settings) {
-  const heroImage = settings.hero_image || settings.background_image || "/history-hero.svg";
-  const heroX = percent(settings.hero_position_x);
-  const heroY = percent(settings.hero_position_y);
+  const heroImage = settings.hero_image || "/history-hero.svg";
+  const heroX = toNumber(settings.hero_position_x);
+  const heroY = toNumber(settings.hero_position_y);
+  const heroZoom = toNumber(settings.hero_zoom, 100) / 100;
 
   heroContainer.innerHTML = `
     <div class="hero-layout">
@@ -76,7 +88,12 @@ function renderHero(settings) {
         <p class="hero-text">${settings.hero_text || ""}</p>
       </div>
       <div class="hero-visual">
-        <img class="hero-image" src="${heroImage}" alt="${settings.hero_title || "Portada historica"}" style="object-position:${heroX}% ${heroY}%;">
+        <img
+          class="hero-image"
+          src="${heroImage}"
+          alt="${settings.hero_title || "Portada historica"}"
+          style="object-position:${heroX}% ${heroY}%; transform:scale(${heroZoom});"
+        >
       </div>
     </div>
   `;
@@ -153,7 +170,6 @@ function renderPosts() {
 
   const currentSection = state.sections.find((section) => section.id === state.activeSection);
   postsTitle.textContent = currentSection ? currentSection.name : "Archivo principal";
-
   postsGrid.innerHTML = "";
 
   if (!filtered.length) {
@@ -169,19 +185,20 @@ function renderPosts() {
     const toggle = fragment.querySelector(".post-toggle");
     const gallery = fragment.querySelector(".post-gallery");
     const galleryUrls = safeSplitGallery(post.gallery_urls);
-    const summaryText = String(post.summary || "");
     const contentText = String(post.content || "");
     const collapsedText = contentText.length > 180 ? `${contentText.slice(0, 180).trim()}...` : contentText;
-    const postX = percent(post.image_position_x);
-    const postY = percent(post.image_position_y);
+    const imageX = toNumber(post.image_position_x);
+    const imageY = toNumber(post.image_position_y);
+    const imageZoom = toNumber(post.image_zoom, 100) / 100;
 
-    image.src = post.image_url || state.settings?.background_image || "/history-hero.svg";
+    image.src = post.image_url || "/history-hero.svg";
     image.alt = post.title;
-    image.style.objectPosition = `${postX}% ${postY}%`;
+    image.style.objectPosition = `${imageX}% ${imageY}%`;
+    image.style.transform = `scale(${imageZoom})`;
     fragment.querySelector(".post-era").textContent = post.era || "Archivo";
     fragment.querySelector(".post-date").textContent = post.display_date;
     fragment.querySelector(".post-title").textContent = post.title;
-    fragment.querySelector(".post-summary").textContent = summaryText;
+    fragment.querySelector(".post-summary").textContent = post.summary;
     collapsed.textContent = collapsedText;
     full.innerHTML = createParagraphs(contentText);
     fragment.querySelector(".post-source").textContent = post.source ? `Fuente: ${post.source}` : "Fuente no especificada";
@@ -192,7 +209,7 @@ function renderPosts() {
       toggle.classList.add("hidden");
     } else {
       toggle.addEventListener("click", () => {
-        const isOpen = full.classList.contains("hidden") === false;
+        const isOpen = !full.classList.contains("hidden");
         full.classList.toggle("hidden", isOpen);
         gallery.classList.toggle("hidden", isOpen || galleryUrls.length === 0);
         collapsed.classList.toggle("hidden", !isOpen);
@@ -217,12 +234,7 @@ async function loadSite() {
     supabase.from("posts").select("*").order("featured", { ascending: false }).order("created_at", { ascending: false })
   ]);
 
-  state.settings = settings || {
-    site_title: "Biblioteca Viva de Historia",
-    hero_title: "Biblioteca Viva de Historia",
-    hero_text: "Archivo visual y editorial para historia, libros, revistas y fuentes.",
-    hero_kicker: "Archivo editorial"
-  };
+  state.settings = settings || {};
   state.sections = sections || [];
   state.posts = posts || [];
 
